@@ -5,6 +5,8 @@ from .views import (
     MyProposalsView,
     ProjectProposalsView,
     WithdrawProposalView,
+    RejectProposalView,
+    AcceptProposalView,
 )
 
 urlpatterns = [
@@ -12,4 +14,6 @@ urlpatterns = [
     path("my-proposals/",MyProposalsView.as_view(),name="my-proposals"),
     path("projects/<int:project_id>/proposals/",ProjectProposalsView.as_view(),name="project-proposals"),
     path("proposal/<int:pk>/",WithdrawProposalView.as_view(),name="withdraw-proposal"),
+    path("proposal/<int:pk>/accept/",AcceptProposalView.as_view(),name="accept-proposal"),
+    path("proposal/<int:pk>/reject/",RejectProposalView.as_view(),name="reject-proposal"),
 ]
