@@ -141,7 +141,6 @@ class StartProjectView(generics.UpdateAPIView):
             status=status.HTTP_200_OK,
         )
 
-
 class CompleteProjectView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
 
@@ -151,24 +150,21 @@ class CompleteProjectView(generics.UpdateAPIView):
             id=kwargs["pk"],
         )
 
+
+        if request.user.role != User.Role.CLIENT:
+            raise PermissionDenied(
+                "Only clients can complete projects."
+            )
+
+        if project.client_id != request.user.id:
+            raise PermissionDenied(
+                "You can only manage your own projects."
+            )
+
+
         if project.status != Project.Status.IN_PROGRESS:
             raise ValidationError(
                 "Only in-progress projects can be completed."
-            )
-
-        is_client = (
-            request.user.role == User.Role.CLIENT
-            and project.client_id == request.user.id
-        )
-
-        is_assigned_freelancer = (
-            request.user.role == User.Role.FREELANCER
-            and project.assigned_freelancer_id == request.user.id
-        )
-
-        if not (is_client or is_assigned_freelancer):
-            raise PermissionDenied(
-                "You are not allowed to complete this project."
             )
 
         project.status = Project.Status.COMPLETED

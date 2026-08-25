@@ -35,10 +35,3 @@ class ProjectSerializer(serializers.ModelSerializer):
             )
         return value
 
-    def validate_deadline(self, value):
-        if value < timezone.localdate():
-            raise serializers.ValidationError(
-                "Deadline cannot be in the past."
-            )
-
-        return value
