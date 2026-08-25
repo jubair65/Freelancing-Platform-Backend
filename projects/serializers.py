@@ -1,5 +1,5 @@
 from rest_framework import serializers
-
+from django.utils import timezone
 from .models import Project
 
 
@@ -33,4 +33,12 @@ class ProjectSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Budget must be greater than zero."
             )
+        return value
+
+    def validate_deadline(self, value):
+        if value < timezone.localdate():
+            raise serializers.ValidationError(
+                "Deadline cannot be in the past."
+            )
+
         return value

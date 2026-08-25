@@ -22,9 +22,25 @@ class SignupSerializer(serializers.ModelSerializer):
             "bio",
             "skills",
         ]
+        read_only_fields = ["id"]
+
+    def validate_name(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError(
+                "Name cannot be empty."
+            )
+        return value
 
     def validate_email(self, value):
-        return value.lower().strip()
+        value = value.lower().strip()
+
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError(
+                "A user with this email already exists."
+            )
+
+        return value
 
     def validate_role(self, value):
         if value not in User.Role.values:
@@ -32,6 +48,8 @@ class SignupSerializer(serializers.ModelSerializer):
                 "Role must be either client or freelancer."
             )
         return value
+
+
 
     def create(self, validated_data):
         password = validated_data.pop("password")

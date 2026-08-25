@@ -26,6 +26,11 @@ class CreateProposalView(generics.CreateAPIView):
             id=project_id,
         )
 
+        if project.client_id == self.request.user.id:
+            raise PermissionDenied(
+                "You cannot submit a proposal to your own project."
+            )
+
         if project.status != Project.Status.OPEN:
             raise PermissionDenied(
                 "Proposals can only be submitted to open projects."
@@ -109,7 +114,10 @@ class AcceptProposalView(generics.UpdateAPIView):
             id=kwargs["pk"],
         )
 
-        project = proposal.project
+        project = (
+            Project.objects.select_for_update()
+            .get(id=proposal.project_id)
+        )
 
         if request.user.role != User.Role.CLIENT:
             raise PermissionDenied(
